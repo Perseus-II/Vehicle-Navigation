@@ -64,6 +64,13 @@ typedef struct vehicle_thrust_s {
 	float heave_b;
 } vehicle_thrust_t;
 
+typedef struct vehicle_dst_s {
+	float temperature;
+	float speed_knts;
+	float depth_m;
+	float depth_ft; 
+} vehicle_dst_t;
+
 
 #define RESET   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */

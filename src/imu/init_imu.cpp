@@ -48,6 +48,7 @@ void *init_imu(void *data) {
 		if(write(imu_fd, "",1) < 0) {
 			printf(RED "[ERROR] Lost connection to IMU... Reconnecting...\n" RESET, buf);
 			close(imu_fd);
+			sleep(2);
 			connect_to_imu();
 		}
 	

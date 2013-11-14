@@ -4,6 +4,7 @@
 #include "../lib/thruster_control.h"
 #include "../lib/imu.h"
 #include "../lib/vehicle_control.h"
+#include "../lib/dst.h"
 
 pthread_mutex_t position_mutex;
 position_t *vehicle_position;
@@ -25,6 +26,9 @@ pid_values_t *vehicle_pid_values;
 pthread_mutex_t initial_orientation_mutex;
 vehicle_orientation_t *vehicle_initial_orientation;
 
+pthread_mutex_t dst_mutex;
+vehicle_dst_t *vehicle_dst;
+
 int vehicle_mode;
 
 int main(int args, char **argv) {
@@ -36,6 +40,7 @@ int main(int args, char **argv) {
 	pthread_t thruster_control;	/* communicates with thruster arduino (A0) */
 	pthread_t gps_fix;		/* communicates with beaglebone at surface */
 	pthread_t imu;
+	pthread_t dst;
 
 	/* allocate memory for shared variables */
 	vehicle_position = (position_t*)malloc(sizeof(position_t));
@@ -44,6 +49,7 @@ int main(int args, char **argv) {
 	desired_vehicle_orientation = (vehicle_orientation_t*)malloc(sizeof(vehicle_orientation_t));
 	vehicle_pid_values = (pid_values_t*)malloc(sizeof(pid_values_t));
 	vehicle_initial_orientation = (vehicle_orientation_t*)malloc(sizeof(vehicle_orientation_t));
+	vehicle_dst = (vehicle_dst_t*)malloc(sizeof(vehicle_dst_t));
 
 	/* initialize mutexes */
 	pthread_mutex_init(&position_mutex, NULL);
@@ -53,6 +59,7 @@ int main(int args, char **argv) {
 	pthread_mutex_init(&mode_mutex, NULL);
 	pthread_mutex_init(&pid_values_mutex, NULL);
 	pthread_mutex_init(&initial_orientation_mutex, NULL);
+	pthread_mutex_init(&dst_mutex, NULL);
 
 	/* set default vehicle mode */
 	/* if we start the control thread before setting the mode, 
@@ -103,6 +110,13 @@ int main(int args, char **argv) {
 	vehicle_initial_orientation -> yaw = 0;
 	pthread_mutex_unlock(&initial_orientation_mutex);
 
+	pthread_mutex_lock(&dst_mutex);
+	vehicle_dst -> temperature = 0.0;
+	vehicle_dst -> speed_knts = 0.0;
+	vehicle_dst -> depth_m = 0.0;
+	vehicle_dst -> depth_ft = 0.0;
+	pthread_mutex_unlock(&dst_mutex);
+
 	void *status;
 	int i;
 	int rc;	
@@ -114,6 +128,7 @@ int main(int args, char **argv) {
 	pthread_create(&vehicle_control, NULL, init_vehicle_control, NULL);
 	pthread_create(&gps_fix, NULL, init_gps_fix, NULL);
 	pthread_create(&imu, NULL, init_imu, NULL);
+	pthread_create(&dst, NULL, init_dst, NULL);
 
 	/* Initialize camera feeds */
 	init_camera_feed(0,9997);
@@ -127,5 +142,6 @@ int main(int args, char **argv) {
 	pthread_join(vehicle_control, NULL);
 	pthread_join(gps_fix, NULL);
 	pthread_join(imu, NULL);
+	pthread_join(dst, NULL);
 }
 
