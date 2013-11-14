@@ -25,9 +25,6 @@ void *init_gps_fix(void *data) {
 	double lat, lon;
 	int siv, siu, dop;
 
-	/*char *hostname = "192.168.10.91";
-	portno = 1477;*/
-
 	while (1){
 		printf(YELLOW "[DEBUG] GPS: connecting to %s:%i" RESET "\n",BEAGLEBONE_SURFACE_IP,BEAGLEBONE_SURFACE_PORT);
 		sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -93,8 +90,8 @@ void *init_gps_fix(void *data) {
 				printf(RED "[DEBUG] GPS: ERROR reading from socket" RESET "\n");
 				break;
 			}
-			printf(GREEN "[DEBUG] GPS: %s" RESET "",buffer);
-			sleep(1);
+			/* sleep for 100ms */
+			usleep(100000);
 		}
 		close(sockfd);
 	}
