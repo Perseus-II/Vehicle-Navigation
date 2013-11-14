@@ -8,6 +8,8 @@
 #include "../lib/port_designations.h"
 #include "extern.h"
 
+#define MAX 255
+
 void *init_gps_fix(void *data) {
 
 	printf(YELLOW "[DEBUG] Init GPS fix" RESET "\n");
@@ -17,7 +19,11 @@ void *init_gps_fix(void *data) {
 	struct sockaddr_in serv_addr;
 	struct hostent *server;
 
-	char buffer[256];
+	char buffer[MAX];
+	char *tok;
+
+	double lat, lon;
+	int siv, siu, dop;
 
 	/*char *hostname = "192.168.10.91";
 	portno = 1477;*/
@@ -55,22 +61,34 @@ void *init_gps_fix(void *data) {
 				printf(RED "[DEBUG] GPS: ERROR writing to socket" RESET "\n");
 				break;
 			}
-			bzero(buffer,256);
-			n = read(sockfd,buffer,255);
-			/*printf("Read %s\n", buffer);
-			char tok[280];
 
-			strncpy(buffer,tok,255);
-			
-			pthread_mutex_lock(&position_mutex);
-				printf("%s\n", strtok(tok, ","));
-				printf("%s\n", strtok(NULL, ","));
-			//	vehicle_position -> lat 			= strtod(strtok(buffer, ","),NULL);
-			//	vehicle_position -> lon 			= strtod(strtok(NULL, ","),NULL);
-			//	vehicle_position -> sv_in_view 		= atoi(strtok(NULL, ","));
-			//	vehicle_position -> sv_in_use 		= atoi(strtok(NULL, ","));
-			//	vehicle_position -> horizontal_dil 	= atof(strtok(NULL, ",")); 
-			pthread_mutex_unlock(&position_mutex);*/
+			if((n=read(sockfd,buffer,MAX)) > 0) {
+				tok = strtok(buffer, ",");
+				if(tok == NULL) continue;
+				lat = atof(tok);
+				tok = strtok(NULL, ",");
+				if(tok == NULL) continue;
+				lon = atof(tok);
+				tok = strtok(NULL, ",");
+				if(tok == NULL) continue;
+				siv = atoi(tok);	
+				tok = strtok(NULL, ",");
+				if(tok == NULL) continue;
+				siu = atoi(tok);	
+				tok = strtok(NULL, ",");
+				if(tok == NULL) continue;
+				dop = atoi(tok);	
+	
+				if(tok != NULL) {
+					pthread_mutex_lock(&position_mutex);
+						vehicle_position -> lat 		= lat;
+						vehicle_position -> lon 		= lon;
+						vehicle_position -> sv_in_view 		= siv;
+						vehicle_position -> sv_in_use 		= siu;
+						vehicle_position -> horizontal_dil 	= dop; 
+					pthread_mutex_unlock(&position_mutex);
+				} 
+			}
 			if (n < 0) {
 				printf(RED "[DEBUG] GPS: ERROR reading from socket" RESET "\n");
 				break;
