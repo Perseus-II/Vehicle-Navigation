@@ -3,5 +3,6 @@
 
 
 void *init_vehicle_control(void*);
+void *init_autonomous_depth(void*);
 
 #endif

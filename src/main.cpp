@@ -41,6 +41,7 @@ int main(int args, char **argv) {
 	pthread_t gps_fix;		/* communicates with beaglebone at surface */
 	pthread_t imu;
 	pthread_t dst;
+	pthread_t autonomous_depth;
 
 	/* allocate memory for shared variables */
 	vehicle_position = (position_t*)malloc(sizeof(position_t));
@@ -129,6 +130,7 @@ int main(int args, char **argv) {
 	pthread_create(&gps_fix, NULL, init_gps_fix, NULL);
 	pthread_create(&imu, NULL, init_imu, NULL);
 	pthread_create(&dst, NULL, init_dst, NULL);
+	pthread_create(&autonomous_depth, NULL, init_autonomous_depth, NULL);
 
 	/* Initialize camera feeds */
 	init_camera_feed(0,9997);
@@ -143,5 +145,6 @@ int main(int args, char **argv) {
 	pthread_join(gps_fix, NULL);
 	pthread_join(imu, NULL);
 	pthread_join(dst, NULL);
+	pthread_join(autonomous_depth, NULL);
 }
 
