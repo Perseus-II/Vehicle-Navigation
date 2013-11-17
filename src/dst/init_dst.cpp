@@ -69,4 +69,5 @@ void connect_to_dst() {
 	set_interface_attribs(dst_fd, B4800, 0);
 	set_blocking(dst_fd, 1);
 	printf(YELLOW "[DEBUG] DST: Connected to Actisense DST" RESET "\n");
+	sleep(2);
 }

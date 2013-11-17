@@ -2,7 +2,7 @@
 #include "../../lib/diagnostics.h"
 #include "../../lib/port_designations.h"
 
-#define MAX 255
+#define MAX 512
 
 using namespace std;
 
@@ -12,6 +12,8 @@ using namespace std;
  * - Battery Voltage
  * - Sea temp 
  * - Lon/Lat Coordinates
+ * - Thrust Vector
+ * - 
  */
 
 void *diagnostics_handler(void *data) {
@@ -21,6 +23,7 @@ void *diagnostics_handler(void *data) {
 	int n;
 
 	while((n=read(sockfd, buf, MAX)) > 0) {
+		printf("Data received: %s\n", buf);
 		/* try to write to the socket to make sure its still alive */
 		strip_newline(buf);
 		pch = strtok(buf, " ,");
@@ -58,11 +61,10 @@ void *init_diagnostics(void *data) {
 	int *newsockfd;
 	int sockfd, clilen, pid;
 	char buf[MAX];
-		
+	int i = 0;	
 	struct sockaddr_in serv_addr;
 	struct sockaddr_in cli_addr;
 
-	pthread_t worker;
 	memset(&serv_addr, 0, sizeof(serv_addr));
 	
 
@@ -78,20 +80,22 @@ void *init_diagnostics(void *data) {
 
 	/* Bind the TCP socket and start listening for connections */
 	bind(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
-	listen(sockfd, 10);
+	listen(sockfd, 20);
 
 	printf(GREEN "[DEBUG] Diagnostics server listening on 0.0.0.0:%d\n" RESET, DIAGNOSTICS_PORT);
 
 	/* Handle incomming connections */
 	while(1) {
+		pthread_t worker;
 		// handle a new connection
 		newsockfd = (int*)malloc(sizeof(int));
 		if((*newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr, (socklen_t*)&clilen)) < 0) {
 			printf(RED "[ERROR] Diagnostics: An error occured on socket accept\n" RESET);
+			continue;
 		}
-
+		printf("NEW CONNECTION, spawning a diagnostics worker.\n");
 		pthread_create(&worker, NULL, &diagnostics_handler, (void*)newsockfd);	
-		pthread_join(worker, NULL);
+		//pthread_join(worker, NULL);
 	}
 	close(sockfd);
 }

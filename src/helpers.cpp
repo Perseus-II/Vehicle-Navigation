@@ -38,6 +38,7 @@ void send_response(char* (*func)(), int sockfd) {
 	res[strlen(res)] = '\n';
 	if(write(sockfd, res, strlen(res)) < 0)
 	       perror("Failed to write response to client");	
+	free(res);
 }
 
 int set_interface_attribs(int fd, int speed, int parity) {
