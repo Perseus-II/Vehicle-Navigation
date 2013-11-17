@@ -60,7 +60,7 @@ char *get_vehicle_orientation() {
 }
 
 char *get_vehicle_info() {
-	char *msg = (char*)malloc(1024*sizeof(char));
+	char *msg = (char*)malloc(4096*sizeof(char));
 	
 	/* return a long string containing all available vehicle information */
 	/*
@@ -84,10 +84,14 @@ char *get_vehicle_info() {
 	int mode;
 	float kp, ki, kd;
 	float depth_ft, depth_m, temperature;
+	float gps_siv, gps_siu, gps_dop;
 
 	pthread_mutex_lock(&position_mutex);
 	position_lat = vehicle_position -> lat;
 	position_lon = vehicle_position -> lon;
+	gps_siv = vehicle_position -> sv_in_view;
+	gps_siu = vehicle_position -> sv_in_use;
+	gps_dop = vehicle_position -> horizontal_dil;
 	pthread_mutex_unlock(&position_mutex);
  
 	pthread_mutex_lock(&thrust_mutex);
@@ -125,7 +129,7 @@ char *get_vehicle_info() {
 	temperature = vehicle_dst -> temperature;
 	pthread_mutex_unlock(&dst_mutex);
 
-	sprintf(msg, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%d,%f,%f,%f,%f,%f,%f",
+	sprintf(msg, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f",
 		position_lat,
 		position_lon,
 		thrust_1,
@@ -144,7 +148,10 @@ char *get_vehicle_info() {
 		kd,
 		depth_ft,
 		depth_m,
-		temperature);
+		temperature,
+		gps_siv,
+		gps_siu,
+		gps_dop);
 
 	return msg;	
 }
