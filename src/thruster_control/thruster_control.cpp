@@ -15,12 +15,13 @@ void connect_to_arduino();
 
 void *init_thruster_control(void *data) {
 	char buf[MAX];
-
+	
 	/* not connected to arduino, attempt to reconnect */
 	if(arduino_fd < 0) connect_to_arduino();
 
 	/* open up a serial connection to the thruster controller arduino A0 */
 	while(1) {
+
 		/* this thread will block if the mutex is currently locked */
 		pthread_mutex_lock(&thrust_mutex);
 		/* only update thrust command if there is a change */

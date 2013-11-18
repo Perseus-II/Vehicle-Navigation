@@ -8,12 +8,19 @@ using namespace std;
 
 char *set_thrust(float surge_port, float surge_starboard, float heave_a, float heave_b) {
 	/* update the global thrust vector */
-	pthread_mutex_lock(&thrust_mutex);
-		vehicle_thrust -> surge_port 		= surge_port;
-		vehicle_thrust -> surge_starboard 	= surge_starboard;
-		vehicle_thrust -> heave_a 		= heave_a;
-		vehicle_thrust -> heave_b 		= heave_b;
-	pthread_mutex_unlock(&thrust_mutex);
+	int vmode;
+	pthread_mutex_lock(&mode_mutex);	
+	vmode = vehicle_mode;
+	pthread_mutex_unlock(&mode_mutex);	
+
+	if(vmode > 0) {
+		pthread_mutex_lock(&thrust_mutex);
+			vehicle_thrust -> surge_port 		= surge_port;
+			vehicle_thrust -> surge_starboard 	= surge_starboard;
+			vehicle_thrust -> heave_a 		= heave_a;
+			vehicle_thrust -> heave_b 		= heave_b;
+		pthread_mutex_unlock(&thrust_mutex);
+	}
 }
 
 char *set_orientation(float pitch, float roll, float yaw) {
