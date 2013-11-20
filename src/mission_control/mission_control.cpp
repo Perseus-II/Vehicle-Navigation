@@ -124,7 +124,7 @@ void *init_mission_control(void *data) {
 		}
 
 		pthread_create(&worker, NULL, &mission_control_handler, (void*)newsockfd);	
-		pthread_join(worker, NULL);
+		//pthread_join(worker, NULL);
 	}
 	close(sockfd);
 }

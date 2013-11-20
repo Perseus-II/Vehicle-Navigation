@@ -85,6 +85,7 @@ char *get_vehicle_info() {
 	float kp, ki, kd;
 	float depth_ft, depth_m, temperature;
 	float gps_siv, gps_siu, gps_dop;
+	float desired_depth;
 
 	pthread_mutex_lock(&position_mutex);
 	position_lat = vehicle_position -> lat;
@@ -111,6 +112,7 @@ char *get_vehicle_info() {
 	desired_orientation_pitch = desired_vehicle_orientation -> pitch;
 	desired_orientation_roll = desired_vehicle_orientation -> roll;
 	desired_orientation_yaw = desired_vehicle_orientation -> yaw;
+	desired_depth = desired_vehicle_orientation -> depth;
 	pthread_mutex_unlock(&desired_orientation_mutex);
 
 	pthread_mutex_lock(&mode_mutex);
@@ -129,7 +131,7 @@ char *get_vehicle_info() {
 	temperature = vehicle_dst -> temperature;
 	pthread_mutex_unlock(&dst_mutex);
 
-	sprintf(msg, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f",
+	sprintf(msg, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f",
 		position_lat,
 		position_lon,
 		thrust_1,
@@ -151,7 +153,8 @@ char *get_vehicle_info() {
 		temperature,
 		gps_siv,
 		gps_siu,
-		gps_dop);
+		gps_dop,
+		desired_depth);
 
 	return msg;	
 }
