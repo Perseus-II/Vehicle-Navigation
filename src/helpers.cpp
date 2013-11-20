@@ -95,3 +95,13 @@ void set_blocking(int fd, int should_block) {
 	if (tcsetattr (fd, TCSANOW, &tty) != 0)
 		printf(RED "[ERROR] error %d setting term attributes\n" RESET, errno);
 }
+
+float arr_sum(float *arr, int len) {
+	float sum;
+	int i;
+	for(i=0; i<len; i++) {
+		sum += arr[i];
+	}
+	return sum;
+}
+	

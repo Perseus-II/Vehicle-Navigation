@@ -25,6 +25,7 @@ int strindex(char*, char);
 void send_response(char* (*func)(), int);
 int set_interface_attribs(int,int,int);
 void set_blocking(int,int);
+float arr_sum(float*,int);
 
 void init_camera_feed(int,int);
 
@@ -33,6 +34,7 @@ void *init_gps_fix(void*);
 #define MODE_DISABLED 0
 #define MODE_MANUAL 1
 #define MODE_AUTON 2
+#define MODE_AUTON_DEPTH 3
 
 typedef struct pid_values_s {
 	float kp;
@@ -44,6 +46,7 @@ typedef struct vehicle_orientation_s {
 	float pitch;
 	float roll;
 	float yaw;
+	float depth;
 } vehicle_orientation_t;
 
 typedef struct position_s {

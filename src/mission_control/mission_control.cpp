@@ -19,7 +19,8 @@ void *mission_control_handler(void *data) {
 	float surge_starboard;
 	float heave_a;
 	float heave_b;
-	float pitch, roll, yaw;
+	float pitch, roll, yaw;	
+	float desired_depth;
 	int n;
 	int mode;
 	
@@ -53,7 +54,7 @@ void *mission_control_handler(void *data) {
 			}
 			if(strcmp(pch, "/set_mode") == 0) {
 				/* set thrust manually */
-				mode = atof(strtok(NULL, " ,"));	
+				mode = atoi(strtok(NULL, " ,"));	
 				set_vehicle_mode(mode);
 			}
 			if(strcmp(pch, "/set_pid_values") == 0) {
@@ -66,6 +67,12 @@ void *mission_control_handler(void *data) {
 			if(strcmp(pch, "/set_current_orientation") == 0) {
 				/* set thrust manually */
 				set_current_orientation();
+			}
+			if(strcmp(pch, "/set_depth") == 0) {
+				/* set thrust manually */
+				desired_depth = atof(strtok(NULL, " ,"));
+				set_desired_depth(desired_depth);
+				printf("Set desired depth = %f\n", desired_depth);
 			}
 		}
 		//strcpy(buf, "mission_control> ");
@@ -88,7 +95,6 @@ void *init_mission_control(void *data) {
 	struct sockaddr_in serv_addr;
 	struct sockaddr_in cli_addr;
 
-	pthread_t worker;
 	memset(&serv_addr, 0, sizeof(serv_addr));
 	
 
@@ -110,6 +116,7 @@ void *init_mission_control(void *data) {
 
 	/* Handle incomming connections */
 	while(1) {
+		pthread_t worker;
 		// handle a new connection
 		newsockfd = (int*)malloc(sizeof(int));
 		if((*newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr, (socklen_t*)&clilen)) < 0) {

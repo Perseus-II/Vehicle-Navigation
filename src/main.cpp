@@ -81,6 +81,7 @@ int main(int args, char **argv) {
 	desired_vehicle_orientation -> pitch	= 	0.0;
 	desired_vehicle_orientation -> roll 	= 	0.0;
 	desired_vehicle_orientation -> yaw 	= 	0.0;
+	desired_vehicle_orientation -> depth 	= 	0.0;
 	pthread_mutex_unlock(&desired_orientation_mutex);
 
 	/* set up initial vehicle orientation */

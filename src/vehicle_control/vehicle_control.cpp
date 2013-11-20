@@ -9,8 +9,6 @@
 #define PI 3.14159265
 #define NUM_ERRORS 20
 
-float arr_sum(float*,int);
-
 void *init_vehicle_control(void *data) {
 	printf(YELLOW "[DEBUG] Init vehicle control thread\n" RESET);
 
@@ -118,13 +116,3 @@ void *init_vehicle_control(void *data) {
 	}
 	
 }
-
-float arr_sum(float *arr, int len) {
-	float sum;
-	int i;
-	for(i=0; i<len; i++) {
-		sum += arr[i];
-	}
-	return sum;
-}
-

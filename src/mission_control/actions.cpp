@@ -61,3 +61,9 @@ char* set_current_orientation() {
 
 	printf(YELLOW "[DEBUG] Updating current orientation to %f,%f,%f\n" RESET, pitch, roll, yaw);
 }
+
+char *set_desired_depth(float depth) {
+	pthread_mutex_lock(&desired_orientation_mutex);
+	desired_vehicle_orientation -> depth = depth;
+	pthread_mutex_unlock(&desired_orientation_mutex);
+}

@@ -12,6 +12,7 @@ char *set_orientation(float, float, float);
 char *set_vehicle_mode(int);
 char *set_pid_values(float,float,float);
 char *set_current_orientation();
+char *set_desired_depth(float);
 
 void *mission_control_handler(void*);
 void *init_mission_control(void*);
