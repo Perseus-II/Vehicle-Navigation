@@ -5,6 +5,7 @@
 #include "../lib/imu.h"
 #include "../lib/vehicle_control.h"
 #include "../lib/dst.h"
+#include "../lib/linear_actuator.h"
 
 pthread_mutex_t position_mutex;
 position_t *vehicle_position;
@@ -31,6 +32,9 @@ vehicle_dst_t *vehicle_dst;
 
 int vehicle_mode;
 
+pthread_mutex_t linear_actuator_mutex;
+linear_actuator_t *linear_actuator_state;
+
 int main(int args, char **argv) {
 	pthread_t diagnostics;
 	pthread_t mission_control;
@@ -42,7 +46,8 @@ int main(int args, char **argv) {
 	pthread_t imu;
 	pthread_t dst;
 	pthread_t autonomous_depth;
-
+	pthread_t linear_actuator_thread;
+	
 	/* allocate memory for shared variables */
 	vehicle_position = (position_t*)malloc(sizeof(position_t));
 	vehicle_thrust = (vehicle_thrust_t*)malloc(sizeof(vehicle_thrust_t));
@@ -51,6 +56,7 @@ int main(int args, char **argv) {
 	vehicle_pid_values = (pid_values_t*)malloc(sizeof(pid_values_t));
 	vehicle_initial_orientation = (vehicle_orientation_t*)malloc(sizeof(vehicle_orientation_t));
 	vehicle_dst = (vehicle_dst_t*)malloc(sizeof(vehicle_dst_t));
+	linear_actuator_state = (linear_actuator_t*)malloc(sizeof(linear_actuator_t));
 
 	/* initialize mutexes */
 	pthread_mutex_init(&position_mutex, NULL);
@@ -61,6 +67,7 @@ int main(int args, char **argv) {
 	pthread_mutex_init(&pid_values_mutex, NULL);
 	pthread_mutex_init(&initial_orientation_mutex, NULL);
 	pthread_mutex_init(&dst_mutex, NULL);
+	pthread_mutex_init(&linear_actuator_mutex, NULL);
 
 	/* set default vehicle mode */
 	/* if we start the control thread before setting the mode, 
@@ -119,6 +126,12 @@ int main(int args, char **argv) {
 	vehicle_dst -> depth_ft = 0.0;
 	pthread_mutex_unlock(&dst_mutex);
 
+	pthread_mutex_lock(&linear_actuator_mutex);
+	linear_actuator_state -> leds_on = FALSE;
+	linear_actuator_state -> laser_on = FALSE;
+	linear_actuator_state -> la_on = 0;
+	pthread_mutex_unlock(&linear_actuator_mutex);
+
 	void *status;
 	int i;
 	int rc;	
@@ -132,6 +145,7 @@ int main(int args, char **argv) {
 	pthread_create(&imu, NULL, init_imu, NULL);
 	pthread_create(&dst, NULL, init_dst, NULL);
 	pthread_create(&autonomous_depth, NULL, init_autonomous_depth, NULL);
+	pthread_create(&linear_actuator_thread, NULL, init_la, NULL);
 
 	/* Initialize camera feeds */
 	init_camera_feed(0,9997);
@@ -147,5 +161,6 @@ int main(int args, char **argv) {
 	pthread_join(imu, NULL);
 	pthread_join(dst, NULL);
 	pthread_join(autonomous_depth, NULL);
+	pthread_join(linear_actuator_thread, NULL);
 }
 

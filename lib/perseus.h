@@ -29,6 +29,7 @@ float arr_sum(float*,int);
 
 void init_camera_feed(int,int);
 
+
 void *init_gps_fix(void*);
 
 #define MODE_DISABLED 0
@@ -73,6 +74,12 @@ typedef struct vehicle_dst_s {
 	float depth_m;
 	float depth_ft; 
 } vehicle_dst_t;
+
+typedef struct linear_actuator_s {
+	int leds_on;
+	int laser_on;
+	int la_on;
+} linear_actuator_t;
 
 
 #define RESET   "\033[0m"

@@ -67,3 +67,11 @@ char *set_desired_depth(float depth) {
 	desired_vehicle_orientation -> depth = depth;
 	pthread_mutex_unlock(&desired_orientation_mutex);
 }
+
+char *set_la(int laser, int la) {
+	pthread_mutex_lock(&linear_actuator_mutex);
+	linear_actuator_state -> leds_on = 0;
+	linear_actuator_state -> laser_on = laser;
+	linear_actuator_state -> la_on = la;
+	pthread_mutex_unlock(&linear_actuator_mutex);
+}

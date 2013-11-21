@@ -23,7 +23,7 @@ void *mission_control_handler(void *data) {
 	float desired_depth;
 	int n;
 	int mode;
-	
+	int laser_on, la_on;	
 	float kp, ki, kd;
 	
 	printf(YELLOW "[DEBUG] Mission control: New connection sockfd = %d\n" RESET, sockfd);	
@@ -73,6 +73,13 @@ void *mission_control_handler(void *data) {
 				desired_depth = atof(strtok(NULL, " ,"));
 				set_desired_depth(desired_depth);
 				printf("Set desired depth = %f\n", desired_depth);
+			}
+			if(strcmp(pch, "/set_la") == 0) {
+				/* set thrust manually */
+				laser_on = atoi(strtok(NULL, " ,"));
+				la_on = atoi(strtok(NULL, " ,"));
+				set_la(laser_on, la_on);
+				printf("Set laser_on = %d | la_on = %d\n", laser_on, la_on);
 			}
 		}
 		//strcpy(buf, "mission_control> ");
